@@ -29,6 +29,13 @@ app.get("/messaging-webhook", (req, res) => {
 	}
 });
 
+app.post("/webhook", (req, res) => {
+	let body = req.body;
+
+	console.log(`\u{1F7EA} Received webhook:`);
+	console.dir(body, { depth: null });
+});
+
 // URL 3: /send-message
 app.post("/send-message", (req, res) => {
 	//   const { recipientId, message } = req.body;
