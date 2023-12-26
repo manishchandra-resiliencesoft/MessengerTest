@@ -14,6 +14,7 @@ app.get("/webhook", (req, res) => {
 
 	console.log(`\u{1F7EA} Received webhook:`);
 	console.dir(body, { depth: null });
+	res.status(200).json({ success: true, message: "event received." });
 });
 
 // URL 3: /send-message
