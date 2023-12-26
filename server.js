@@ -39,7 +39,7 @@ app.post("/webhook", (req, res) => {
 
 // URL 3: /send-message
 app.post("/send-message", (req, res) => {
-  const { recipientId, message } = req.body;
+  //   const { recipientId, message } = req.body;
 
   if (!recipientId || !message) {
     return res
@@ -53,10 +53,10 @@ app.post("/send-message", (req, res) => {
       {
         messaging_type: "RESPONSE",
         recipient: {
-          id: recipientId,
+          id: "122093648912167673",
         },
         message: {
-          text: message,
+          text: "Hi test message from api",
         },
       },
       {
