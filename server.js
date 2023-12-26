@@ -1,43 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
-// const { MessengerBot } = require("fb-messenger-bot-api");
-
 const app = express();
-const port = 3000;
+const VERIFY_TOKEN = "thisistesttoken";
+const PAGE_ACCESS_TOKEN =
+  "EAAJnWdBLtD0BO6k9iHuXk7BXsxkqELRtp31nZBX1AFWjoDe9UFZCPH3aEISsv0Szb0WrQZCjxnzWgUJC9UzPs2qi811onx7H9KyFSurZC7SjIQmjO6pVTskaImgBbKnxWHZAfQhSoFUCv0igdu0L6kHX9wHslBMj0ZAN3EVvz1XDFyFnEIrRR3zROu5JqtTPZCYvvN0ctUZD";
 
 app.use(bodyParser.json());
 
-const VERIFY_TOKEN = 'thisistesttoken';
-
-// Replace 'YOUR_PAGE_ACCESS_TOKEN' with your actual Page Access Token
-// const bot = new MessengerBot({
-//   pageAccessToken: "YOUR_PAGE_ACCESS_TOKEN",
-//   verifyToken: "YOUR_VERIFY_TOKEN",
-// });
-
-// app.use("/webhook", bot.middleware());
-
-// bot.on("message", (message) => {
-//   // Handle incoming messages (optional)
-//   console.log(message);
-// });
-
-// Endpoint for sending a message
-// app.post("/send-message", async (req, res) => {
-//   const { recipientId, messageText } = req.body;
-
-//   try {
-//     await bot.sendMessage(recipientId, { text: messageText });
-//     res
-//       .status(200)
-//       .json({ success: true, message: "Message sent successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, message: "Error sending message" });
-//   }
-// });
-
+// URL 1: /webhook
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -50,34 +21,67 @@ app.get("/webhook", (req, res) => {
   }
 });
 
-app.post("/send-message", async (req, res) => {
-  //   const { recipientId, messageText, accessToken } = req.body;
+// URL 2: /webhook
+app.post("/webhook", (req, res) => {
+  const body = req.body;
 
-  try {
-    const response = await axios.post(
-      `https://graph.facebook.com/v12.0/122093648912167673/messages`,
-      {
-        message: { text: "Hi testing from api" },
-        messaging_type: "RESPONSE",
-      },
-      {
-        params: {
-          access_token:
-            "EAAJnWdBLtD0BOzDZBZA0x7X2vLpOIZADlVi5ZCS29GElga0A3TIghUNsZBz9ZAdigqp0dlKFjYmjOZBlOjze8gXX7UKANUgz6nbOM0pXcW2Bf36PEklZB4hr0sxztiiZANUYxOlLyTpAu5mOiEpmQhMheYEhnCMsmqpX7PLVxBnjo5rzqVRUcOUMsUG9eajtO6OQH",
-        },
-      }
-    );
+  if (body.object === "page") {
+    body.entry.forEach((entry) => {
+      const webhookEvent = entry.messaging[0];
+      console.log(webhookEvent);
+    });
 
-    console.log(response.data);
-    res
-      .status(200)
-      .json({ success: true, message: "Message sent successfully" });
-  } catch (error) {
-    console.error("error", error.data);
-    res.status(500).json({ success: false, message: "Error sending message" });
+    res.status(200).send("EVENT_RECEIVED");
+  } else {
+    res.sendStatus(404);
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// URL 3: /send-message
+app.post("/send-message", (req, res) => {
+  const { recipientId, message } = req.body;
+
+  if (!recipientId || !message) {
+    return res
+      .status(400)
+      .json({ error: "Recipient ID and message are required." });
+  }
+
+  axios
+    .post(
+      "https://graph.facebook.com/v12.0/me/messages",
+      {
+        messaging_type: "RESPONSE",
+        recipient: {
+          id: recipientId,
+        },
+        message: {
+          text: message,
+        },
+      },
+      {
+        params: {
+          access_token: PAGE_ACCESS_TOKEN,
+        },
+      }
+    )
+    .then((response) => {
+      console.log("Message sent:", response.data);
+      res
+        .status(200)
+        .json({ success: true, message: "Message sent successfully." });
+    })
+    .catch((error) => {
+      console.error("Error sending message:", error.response.data);
+      res.status(500).json({ error: "Error sending message." });
+    });
 });
+
+// URL 4: /test
+app.get("/test", (req, res) => {
+  console.log("GET Request to /test");
+  res.status(200).send("This is a simple GET endpoint for testing.");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
