@@ -8,6 +8,8 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
+const VERIFY_TOKEN = 'thisistesttoken';
+
 // Replace 'YOUR_PAGE_ACCESS_TOKEN' with your actual Page Access Token
 // const bot = new MessengerBot({
 //   pageAccessToken: "YOUR_PAGE_ACCESS_TOKEN",
@@ -36,21 +38,15 @@ app.use(bodyParser.json());
 //   }
 // });
 
-app.post("/webhook", (req, res) => {
-  const body = req.body;
+app.get("/webhook", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
 
-  if (body.object === "page") {
-    body.entry.forEach((entry) => {
-      const webhookEvent = entry.messaging[0];
-      const senderId = webhookEvent.sender.id;
-      // Use senderId to send a response or store it for later use
-
-      console.log("senderId==========>", senderId);
-    });
-
-    res.status(200).send("EVENT_RECEIVED");
+  if (mode && token === VERIFY_TOKEN) {
+    res.status(200).send(challenge);
   } else {
-    res.sendStatus(404);
+    res.sendStatus(403);
   }
 });
 
@@ -77,7 +73,7 @@ app.post("/send-message", async (req, res) => {
       .status(200)
       .json({ success: true, message: "Message sent successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("error", error.data);
     res.status(500).json({ success: false, message: "Error sending message" });
   }
 });
