@@ -37,3 +37,7 @@ app.post("/send-message", (req, res) => {
 	console.log(`\u{1F7EA} Received webhook:`);
 	console.dir(body, { depth: null });
 });
+
+app.listen(port, () => {
+	console.log(`Server is running on port ${port}`);
+});
