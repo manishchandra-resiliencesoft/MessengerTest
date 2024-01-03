@@ -27,7 +27,7 @@ app.get("/messaging-webhook", (req, res) => {
 	}
 });
 
-app.post("/send-message", (req, res) => {
+app.post("/messaging-webhook", (req, res) => {
 	console.log("requetsed==============>send");
 	let body = req.body;
 
