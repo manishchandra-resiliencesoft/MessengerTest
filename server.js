@@ -1,10 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const axios = require("axios");
 const app = express();
-const VERIFY_TOKEN = "thisistesttoken";
-const PAGE_ACCESS_TOKEN =
-	"EAAJnWdBLtD0BO6k9iHuXk7BXsxkqELRtp31nZBX1AFWjoDe9UFZCPH3aEISsv0Szb0WrQZCjxnzWgUJC9UzPs2qi811onx7H9KyFSurZC7SjIQmjO6pVTskaImgBbKnxWHZAfQhSoFUCv0igdu0L6kHX9wHslBMj0ZAN3EVvz1XDFyFnEIrRR3zROu5JqtTPZCYvvN0ctUZD";
+const port = 3000;
 
 app.use(bodyParser.json());
 
