@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 // Add support for GET requests to our webhook
 app.get("/messaging-webhook", (req, res) => {
-	console.log("requetsed==============>");
+	console.log("requetsedd==============>");
 	// Parse the query params
 	let mode = req.query["hub.mode"];
 	let token = req.query["hub.verify_token"];
